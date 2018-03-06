@@ -156,6 +156,148 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-vue180301" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/01/vue180301/">vue中的组件以及数据传递</a>
+    </h1>
+  
+
+        
+        <a href="/2018/01/01/vue180301/" class="archive-article-date">
+  	<time datetime="2018-01-01T00:55:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="1-组件化开发："><a href="#1-组件化开发：" class="headerlink" title="1-组件化开发："></a>1-组件化开发：</h2><p>我们可以很直观的将一个复杂的页面分割成若干个独立组件，每个组件包含自己的逻辑和样式，再将这些独立组件组合完成一个复杂的页面。这样既减少了逻辑复杂度，又实现了代码的重用。页面是组件的容器，组件自由组合形成完整的页面，当不需要某个组件时，或想要替换某个组件时，可以随时进行替换和删除，而不影响整个应用的运行。</p>
+<h2 id="2-组件化开发的好处"><a href="#2-组件化开发的好处" class="headerlink" title="2-组件化开发的好处"></a>2-组件化开发的好处</h2><ul>
+<li>提高开发效率</li>
+<li>方便重复使用</li>
+<li>便于协同开发</li>
+<li>更容易被管理和维护<h2 id="3-VUE中组件的特点"><a href="#3-VUE中组件的特点" class="headerlink" title="3-VUE中组件的特点"></a>3-VUE中组件的特点</h2>vue中一个自定义标签（不是W3C规定的标准标签如div、p等），vue就会把他看成一个组件<br>不能光写一个自定义的标签而不赋予意义<h2 id="4-组件分类"><a href="#4-组件分类" class="headerlink" title="4-组件分类"></a>4-组件分类</h2></li>
+<li>页面级组件： <ol>
+<li>一个页面是一个组件 </li>
+<li>将可复用的部分抽离出来 基础组件</li>
+</ol>
+</li>
+</ul>
+<p>全局组件：声明一次 可以在任何地方使用</p>
+<p>局部组件：必须告诉这个组件属于谁<br>一般写插件的时候或者很多人都要用，使用全局组件的多一些。</p>
+<ul>
+<li>组件名不要带有大写，多个单词用-连接</li>
+<li>只要组件名和定义的名字相同时可以的（首字母可以大写，中间不要有大写）</li>
+<li>html采用短横线隔开命名法 JS中转驼峰也是可以的<br>定义全局组件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Vue.component(&apos;my-handsome&apos;,&#123; //一个对象可以看成一个组件</span><br><span class="line">//在自己定义的模板中取自己data返回的数据</span><br><span class="line">template:&apos;&lt;div&gt;&#123;&#123;msg&#125;&#125;&lt;/div&gt;&apos;,</span><br><span class="line">//组件中数据必须是函数类型，返回一个实例作为组件的数据</span><br><span class="line">data()&#123;</span><br><span class="line">return &#123;msg:&apos;我很英俊&apos;&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;)</span><br><span class="line">let vm=new Vue(&#123;</span><br><span class="line">el:&apos;#app&apos;,</span><br><span class="line">data:&#123;</span><br><span class="line">........</span><br><span class="line">&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="定义局部组件"><a href="#定义局部组件" class="headerlink" title="定义局部组件"></a>定义局部组件</h3><p>局部组件使用的三部曲：</p>
+<ol>
+<li>创建这个组件</li>
+<li>注册这个组件</li>
+<li>使用这个组件</li>
+</ol>
+<ul>
+<li>组件是相互独立的，不能直接跨作用域(子组件不能直接使用父组件的data) </li>
+<li>vm的实例也是一个组件，自定义组件中也拥有声明周期函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">如果组件共用了数据，会导致同时刷新，但是组件应该是独立性的</span><br><span class="line">为什么会独立呢？</span><br><span class="line">因为data是一个函数，return 出去是一个新对象，新对象那就是一个独立的作用域。</span><br><span class="line">所以组件中的data要是一个函数，函数是一个作用域，return 出去一个新对象，</span><br><span class="line">这样就与其他组件的data不冲突是独立的了</span><br></pre></td></tr></table></figure>
+<ul>
+<li>组件理论上是可以无限嵌套的，因为vm本身就是一个组件，他里面也自定义了组件，并且自定义的组件也是一个对象，</li>
+<li>并且和其父级一样拥有各种属性，所以其自己又可以作为“父组件”，他里面也可以放组件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">let obj=&#123;</span><br><span class="line">school:&apos;zfpx&apos;</span><br><span class="line">&#125;;</span><br><span class="line">//1.创建组件</span><br><span class="line">let component1=&#123;</span><br><span class="line">//这里的引号问题 把里面的单引号转义一下，或者使用ES6的模板字符串</span><br><span class="line">template:&apos;&lt;div @click=&quot;school=&apos;home&apos;&quot;&gt;组件一 &#123;&#123;school&#125;&#125;&lt;/div&gt;&apos;,</span><br><span class="line">data()&#123;</span><br><span class="line">return obj;</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br><span class="line">let component2=&#123;</span><br><span class="line">template:&apos;&lt;div @click=&quot;fn&quot;&gt;组件二 &#123;&#123;school&#125;&#125;&lt;/div&gt;&apos;,</span><br><span class="line">data()&#123;</span><br><span class="line">return obj;</span><br><span class="line">&#125;,</span><br><span class="line">methods:&#123;</span><br><span class="line">fn()&#123;</span><br><span class="line">//这里的this不再指向其父级vm，而是指向自己的组件</span><br><span class="line">console.log(this)</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">let vm=new Vue(&#123;</span><br><span class="line">el:&apos;#app&apos;,</span><br><span class="line">//2.注册组件</span><br><span class="line">components:&#123;</span><br><span class="line">component1:component1, //在ES6中名字一样可以只写一个,如component2那样</span><br><span class="line">component2,</span><br><span class="line">&#125;,</span><br><span class="line">data:&#123;</span><br><span class="line">a:1</span><br><span class="line">&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="组件嵌套"><a href="#组件嵌套" class="headerlink" title="组件嵌套"></a>组件嵌套</h3><ol>
+<li>如果要在一个组件中使用另一个组件，先要保证使用的组件得是真实存在的，</li>
+<li>在需要引用这个组件的实例通过components注册这个组件</li>
+<li>组件需要在父级的模板中通过标签的形式引入</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">//son中要用到grandson，所以得把grandson声明到son上面</span><br><span class="line">let grandson=&#123;</span><br><span class="line">template:&apos;&lt;div&gt;grandson&lt;/div&gt;&apos;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line">//parent中要用到儿子，所以得先把son声明到parent上面</span><br><span class="line">let son=&#123;</span><br><span class="line">template:&apos;&lt;div&gt;son &lt;grandson&gt;&lt;/grandson&gt;&lt;/div&gt;&apos;,</span><br><span class="line">components:&#123;</span><br><span class="line">grandson</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br><span class="line">let parent=&#123;</span><br><span class="line">template:&apos;&lt;div&gt;parent &lt;son&gt;&lt;/son&gt;&lt;/div&gt;&apos;,</span><br><span class="line">components:&#123;</span><br><span class="line">son,</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">let vm=new Vue(&#123;</span><br><span class="line">el:&apos;#app&apos;,</span><br><span class="line">template:&apos;&lt;parent&gt;&lt;/parent&gt;&apos;,</span><br><span class="line">components:&#123;</span><br><span class="line">parent</span><br><span class="line">&#125;,</span><br><span class="line">data:&#123;</span><br><span class="line">a:1</span><br><span class="line">&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="父子组件数据传递-父传子"><a href="#父子组件数据传递-父传子" class="headerlink" title="父子组件数据传递(父传子)"></a>父子组件数据传递(父传子)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">组件的传递：</span><br><span class="line">父亲 -&gt; 儿子 -&gt; 孙子 （属性传递）</span><br><span class="line">孙子 -&gt; 儿子 -&gt; 父亲  (事件传递)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>html结构<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">    &lt;div id=&quot;app&quot;&gt; </span><br><span class="line">父亲：&#123;&#123;money&#125;&#125; </span><br><span class="line">&lt;!--当前组件的属性(m)=父级的值(1)--&gt;</span><br><span class="line">&lt;!--&lt;child m=&quot;1&quot;&gt;&lt;/child&gt;--&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!--给儿子加了一个m属性，属性对应的数据是属于父亲的，但是直接写m=&quot;money&quot;,money就成了字符串了 </span><br><span class="line">但是我们后面的money是一个变量，所以我们就得用动态绑定:m=&quot;money&quot;的格式了</span><br><span class="line">如：</span><br><span class="line">a=&apos;1&apos; =&gt;得到的1是一个字符串 :a=&quot;1&quot; =&gt;得到的1是一个数字</span><br><span class="line">a=&quot;true&quot; =&gt;得到的是一个字符串&quot;true&quot;   :a=&quot;true&quot; =&gt;得到的是一个布尔</span><br><span class="line"> </span><br><span class="line">如果自定的属性是有短横线连接的写法时 m-m的话，下面用的话得用驼峰mM</span><br><span class="line">--&gt;</span><br><span class="line">&lt;child :m=&quot;money&quot;&gt;&lt;/child&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="父传子流程："><a href="#父传子流程：" class="headerlink" title="父传子流程："></a>父传子流程：</h3><ul>
+<li>1.首先子组件嵌套在父组件内（结构） </li>
+<li>2.在html中给子组件的标签中 加上自定义属性 并赋值，这个值就是要在父组件中得到的数据，既然是数据，肯定要是变量，所以我们要给<br>这个属性前面加上:,叫做动态绑定 </li>
+<li>3.在JS中子组件里，props接收(获取)在上一步中子组件中定义的属性值 </li>
+<li>4.然后在子组件定义的模板中就可以用获取到的属性值了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">//这个实例就是一个组件，parent</span><br><span class="line">let vm=new Vue(&#123;</span><br><span class="line">el:&apos;#app&apos;,</span><br><span class="line">components:&#123;</span><br><span class="line">child:&#123;</span><br><span class="line">//会在当前子组件上声明一个m属性，值是父亲的。(儿子通过props获取到父亲的m属性值)相当于 this.m=100</span><br><span class="line">//如果props是一个数组，他不能校验里面获取到的值是什么类型,把其变成一个对象，里面有几个方法如下：</span><br><span class="line">//props:[&apos;m&apos;,&apos;a&apos;],</span><br><span class="line">props:&#123;</span><br><span class="line">//校验时不能阻断代码的执行，只是警告而已</span><br><span class="line">m:&#123; //校验属性的类型，如果不带:,得到的肯定是字符串类型，只有:m=&quot;1&quot;才是数字类型1，:m=&quot;true&quot;才是布尔类型</span><br><span class="line">type:[String,Boolean,Function,Object,Array,Number],</span><br><span class="line">//如果什么都不传，会调用default,要给一个默认值,否则就是false了</span><br><span class="line">default:0,</span><br><span class="line">//此属性是必须传递的意思，但不能与default同用</span><br><span class="line">required:true,</span><br><span class="line">//自定义校验器 第一个参数是当前传递的值，返回true表示通过，false表示不通过</span><br><span class="line">validator(val)&#123;</span><br><span class="line">return val&gt;300</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line"> </span><br><span class="line">data()&#123;</span><br><span class="line">return &#123;n:5&#125;    //有了上面的props中的m了，就不能再让自己data（包括methods等其他对象中）中有m了，会冲突</span><br><span class="line">&#125;,</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">template:&apos;&lt;div&gt;儿子：&#123;&#123;m&#125;&#125; &#123;&#123;n&#125;&#125;&lt;/div&gt;&apos;,</span><br><span class="line">//如果想在child中取的值名跟parent保持一致，我们可以用computed属性；但是这样很麻烦，直接在child上设置属性的时候</span><br><span class="line">//设置成跟parent一样的名字就好了</span><br><span class="line">// computed:&#123;</span><br><span class="line">//     money()&#123;return this.m&#125;</span><br><span class="line">// &#125;,</span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line">data:&#123;</span><br><span class="line">money:400</span><br><span class="line">&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="父子组件数据传递-子传父"><a href="#父子组件数据传递-子传父" class="headerlink" title="父子组件数据传递(子传父)"></a>父子组件数据传递(子传父)</h2><ul>
+<li>父亲绑定一些事件，儿子触发这个事件，将参数传递过去 </li>
+<li>单项数据流：(儿子不能改爸爸的数据，告诉爸爸让他改，父亲数据刷新后，儿子就刷新了)<h3 id="html结构"><a href="#html结构" class="headerlink" title="html结构"></a>html结构</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> &lt;div id=&quot;app&quot;&gt; </span><br><span class="line">父亲：&#123;&#123;money&#125;&#125; </span><br><span class="line">&lt;!--child.$on(&apos;child-msg&apos;,things)  相当于订阅--&gt;</span><br><span class="line">&lt;child :m=&quot;money&quot; @child-msg=&quot;things&quot;&gt;&lt;/child&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="子传父流程："><a href="#子传父流程：" class="headerlink" title="子传父流程："></a>子传父流程：</h2><ol>
+<li><p>首先在父可以传子的基础上，给child一个自定义事件，并且这个自定义事件是父亲的方法</p>
+</li>
+<li><p>在子组件的methods中定义一个儿子的方法，并且这个方法是要传递(发射)给上一步儿子的自定义方法的，第一个参数是<br>child上自定义的事件名，第二个参数是要传递的值</p>
+</li>
+<li>于是当子组件中的方法触发(点击、双击等等)时,父亲的方法就收到了儿子发射的方法中传递的值，然后更新自己的数据即可。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//这个实例就是一个组件，parent</span><br><span class="line">let vm=new Vue(&#123;</span><br><span class="line">el:&apos;#app&apos;,</span><br><span class="line">data:&#123;</span><br><span class="line">money:400</span><br><span class="line">&#125;,</span><br><span class="line">methods:&#123;</span><br><span class="line">//相当于发布订阅的on</span><br><span class="line">things(val)&#123;</span><br><span class="line">this.money=val;</span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line">components:&#123;</span><br><span class="line">child:&#123;</span><br><span class="line">props:[&apos;m&apos;],</span><br><span class="line">template:&apos;&lt;div&gt;儿子：&#123;&#123;m&#125;&#125; &lt;button @dblclick=&quot;getMoney()&quot;&gt;多要钱&lt;/button&gt;&lt;/div&gt;&apos;,</span><br><span class="line">methods:&#123;</span><br><span class="line">getMoney()&#123;</span><br><span class="line">//触发自己的自定义事件，让父亲的方法执行 相当于发布</span><br><span class="line">this.$emit(&apos;child-msg&apos;,800)</span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line"> </span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line"> </span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">vue</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">html5</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/前端/" class="article-tag-list-link color3">前端</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/01/01/vue180301/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-test" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -613,6 +755,14 @@
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">React</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">vue</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">html5</a>
               </li>
             
             <div class="clearfix"></div>
